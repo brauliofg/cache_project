@@ -35,6 +35,7 @@ int main(int argc, char *argv[]){
             return -1;
         }
     }
+    printInput(input);
 
     //Free struct that holds information from command line
     freeInput(input);
