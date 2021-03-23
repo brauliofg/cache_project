@@ -1,8 +1,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#define COST_OF_CACHE 0.09
 
-typedef struct InputData
+//CacheData struct that holds cache information
+typedef struct CacheData
 {
     int cacheSize;
     int blockSize;
@@ -10,37 +12,65 @@ typedef struct InputData
     char *fileName;
     char *replacementPolicy;
 
-}InputData;
+}CacheData;
 
-InputData *makeInputStruct(){
-    InputData *input;
-    input = (InputData*)malloc(sizeof(InputData));
-    input->fileName = (char*)malloc(sizeof(char)*50);
-    input->replacementPolicy = (char*)malloc(sizeof(char)*4);
-
-    return input;
+//Frees CacheData struct
+void freeCache(CacheData *cache){
+    free(cache->fileName);
+    free(cache->replacementPolicy);
+    free(cache);
 }
 
-void freeInput(InputData *input){
-    free(input->fileName);
-    free(input->replacementPolicy);
-    free(input);
+/* Initializes CacheData struct with command line arguments and exits program
+   if unknown flag is found */
+CacheData *initCacheData(int argc, char* argv[]){
+    CacheData *cache;
+    cache = (CacheData*)malloc(sizeof(CacheData));
+    cache->fileName = (char*)malloc(sizeof(char)*50);
+    cache->replacementPolicy = (char*)malloc(sizeof(char)*4);
+
+    int i;
+    for(i=1;i<argc;i+=2){
+        if(strcmp(argv[i], "-f")==0){
+            strcpy(cache->fileName, argv[i+1]);
+        }
+        else if(strcmp(argv[i], "-s")==0){
+            cache->cacheSize = atoi(argv[i+1]);
+        }
+        else if(strcmp(argv[i], "-b")==0){
+            cache->blockSize = atoi(argv[i+1]);
+        }
+        else if(strcmp(argv[i], "-a")==0){
+            cache->associativity = atoi(argv[i+1]);
+        }
+        else if(strcmp(argv[i], "-r")==0){
+            strcpy(cache->replacementPolicy, argv[i+1]);
+        }
+        else{
+            printf("Unknown input.\nExiting.\n");
+            freeCache(cache);
+            exit(0);
+        }
+    }
+
+    return cache;
 }
 
-void printInput(InputData *input){
+//Prints Cache Input Parameters
+void printCacheInput(CacheData *cache){
     printf("Cache Simulator CS 3853 Spring 2021 - Group #8\n\n");
-    printf("Trace File: %s\n", input->fileName);
+    printf("Trace File: %s\n", cache->fileName);
     printf("\n***** Cache Input Parameters *****\n\n");
-    printf("Cache Size:             %d KB\n", input->cacheSize);
-    printf("Block Size:             %d bytes\n", input->blockSize);
-    printf("Associativity:          %d\n", input->associativity);
-    if(strcmp(input->replacementPolicy, "RR")==0){
+    printf("Cache Size:             %d KB\n", cache->cacheSize);
+    printf("Block Size:             %d bytes\n", cache->blockSize);
+    printf("Associativity:          %d\n", cache->associativity);
+    if(strcmp(cache->replacementPolicy, "RR")==0){
         printf("Replacement Policy:     Round-robin\n");
     }
-    else if(strcmp(input->replacementPolicy, "RND")==0){
+    else if(strcmp(cache->replacementPolicy, "RND")==0){
         printf("Replacement Policy:     Random\n");
     }
-    else if(strcmp(input->replacementPolicy, "LRU")==0){
+    else if(strcmp(cache->replacementPolicy, "LRU")==0){
         printf("Replacement Policy:     Least Recently Used\n");
     }
 }
