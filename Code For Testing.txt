@@ -1,4 +1,4 @@
-CODE TO TEST CALC VALUES:
+CODE TO TEST CALC VALUES: //In order to run the entire code compile using gcc -o sim.out -std=c99 sim.c -lm. "-lm" is needed in order to use math.h correctly.
 //Used to create a CacheData struct for testing. Can change values.
 CacheData cacheTest;    
 cacheTest.cacheSize = 512;
