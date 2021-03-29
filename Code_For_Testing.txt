@@ -1,0 +1,14 @@
+CODE TO TEST CALC VALUES: //In order to run the entire code compile using gcc -o sim.out -std=c99 sim.c -lm. "-lm" is needed in order to use math.h correctly.
+//Used to create a CacheData struct for testing. Can change values.
+CacheData cacheTest;    
+cacheTest.cacheSize = 512;
+cacheTest.blockSize = 16;
+cacheTest.associativity = 8;
+
+//Passes cacheTest
+CalcData *calcData = initCalcData(&cacheTest);
+  
+//Used to temporary print CalcData Values
+printf("#B %i : OFF %i : TAG %i : INDEX %i : ROWS %i : OVERHEAD %i : IMP %i : COST %lf\n", calcData->totalBlocks, calcData->offset, calcData->tagSize, calcData->indexSize,
+  calcData->totalRows, calcData->overHeadSize, calcData->implementationBytesMemSize, calcData->cost);
+

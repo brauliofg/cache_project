@@ -13,10 +13,18 @@ int main(int argc, char *argv[]){
     //Verify data and initialize CacheData struct with command line arguments
     CacheData *cache = initCacheData(argc, argv);
     
+    //Initializes CalcData struct based on cache struct
+    CalcData *calcData = initCalcData(cache);
+    
     //Print Cache Input Parameters
     printCacheInput(cache);
+    
+    //Print Cache Calculated Results
+    printCacheResults(calcData);
 
     //Free struct that holds information from command line
     freeCache(cache);
+    //Free struct that holds calc information
+    free(calcData);
     return 0;
 }
