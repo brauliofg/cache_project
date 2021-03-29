@@ -16,9 +16,12 @@ int main(int argc, char *argv[]){
     //Print Cache Input Parameters
     printCacheInput(cache);
     
+    //Initializes calculation data based on cache struct
     CalcData *calcData = initCalcData(cache);
 
     //Free struct that holds information from command line
     freeCache(cache);
+    //Free struct that holds calc information
+    free(calcData);
     return 0;
 }
