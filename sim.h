@@ -22,8 +22,9 @@ typedef struct CalcData
     int indexSize;
     int totalRows;
     int overHeadSize;
-    int implementationMemSize;
-    int cost;
+    int implementationBytesMemSize;
+    double cost;
+    
 }CalcData;
 
 //Frees CacheData struct
@@ -66,6 +67,39 @@ CacheData *initCacheData(int argc, char* argv[]){
     }
 
     return cache;
+}
+
+// Calulates cache values and stores them in CalcData struct using CacheData struct. Uses change of base formula for log base 2 on some calculations.
+void calculateCacheValues(CacheData *cacheData, CalcData *calcData){
+    
+	//Constants for calculations
+	const int DATA_BUS = 32;
+	const int ONE_KB = 1024;
+	const double DOUBLE_TWO = (double)2;
+	
+	//Calculate offset uses change base formula
+    int offset = (int)(log10((double)cacheData->blockSize) / log10(DOUBLE_TWO))
+    
+	//Calculate total blocks
+    calcData->totalBlocks = cacheData->cacheSize * ONE_KB / cacheData->blockSize;
+	
+	//Calculate index size uses change base formula
+    calcData->indexSize = (int)(log10((double)(cacheData->cacheSize * ONE_KB / (cacheData->associativity * cacheData->blockSize))) / log10(DOUBLE_TWO));
+	
+	//Calculate tag size
+	calcData->tagSize = DATA_BUS - offset - calcData->indexSize;
+	
+	//Calculate total rows
+	calcData->totalRows = (int)pow(DOUBLE_TWO, (double)calcData->indexSize);
+	
+	//Calculate overhead size
+	calcData->overHeadSize = calcData->totalRows + (int)pow(DOUBLE_TWO, (double)calcData->tagSize);
+	
+	//Calculate total implementation memory size in bytes
+	calcData->implementationBytesMemSize = cacheData->cacheSize * ONE_KB + overHeadSize;
+	
+	//Calculate total cost
+	calcData->cost = calcData->implementationBytesMemSize / ONE_KB * COST_OF_CACHE;    
 }
 
 //Prints Cache Input Parameters
