@@ -72,7 +72,7 @@ CacheData *initCacheData(int argc, char* argv[]){
 }
 
 // Calulates cache values and stores them in CalcData struct using CacheData struct. Uses change of base formula for log base 2 on some calculations.
-CalcData *initCalcValues(CacheData *cacheData){	
+CalcData *initCalcData(CacheData *cacheData){	
     //Constants for calculations
     const int DATA_BUS = 32;
     const int ONE_KB = 1024;
@@ -81,7 +81,7 @@ CalcData *initCalcValues(CacheData *cacheData){
     CalcData *calcData = (CalcData*)malloc(sizeof(CalcData));
 
     //Calculate offset uses change base formula
-    calcData->offset = (int)(log10((double)cacheData->blockSize) / log10(DOUBLE_TWO))
+    calcData->offset = (int)(log10((double)cacheData->blockSize) / log10(DOUBLE_TWO));
 
     //Calculate total blocks
     calcData->totalBlocks = cacheData->cacheSize * ONE_KB / cacheData->blockSize;
@@ -90,7 +90,7 @@ CalcData *initCalcValues(CacheData *cacheData){
     calcData->indexSize = (int)(log10((double)(cacheData->cacheSize * ONE_KB / (cacheData->associativity * cacheData->blockSize))) / log10(DOUBLE_TWO));
 
     //Calculate tag size
-    calcData->tagSize = DATA_BUS - offset - calcData->indexSize;
+    calcData->tagSize = DATA_BUS - calcData->offset - calcData->indexSize;
 
     //Calculate total rows
     calcData->totalRows = (int)pow(DOUBLE_TWO, (double)calcData->indexSize);
@@ -99,7 +99,7 @@ CalcData *initCalcValues(CacheData *cacheData){
     calcData->overHeadSize = calcData->totalRows + (int)pow(DOUBLE_TWO, (double)calcData->tagSize);
 
     //Calculate total implementation memory size in bytes
-    calcData->implementationBytesMemSize = cacheData->cacheSize * ONE_KB + overHeadSize;
+    calcData->implementationBytesMemSize = cacheData->cacheSize * ONE_KB + calcData->overHeadSize;
 
     //Calculate total cost
     calcData->cost = calcData->implementationBytesMemSize / ONE_KB * COST_OF_CACHE;
