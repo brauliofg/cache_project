@@ -9,5 +9,6 @@ cacheTest.associativity = 8;
 CalcData *calcData = initCalcData(&cacheTest);
   
 //Used to temporary print CalcData Values
-printf("#B %i : OFF %i : TAG %i : INDEX %i : ROWS %i : OVERHEAD %i : IMP %i : COST %lf\n", calcData->totalBlocks, calcData->offset, calcData->tagSize, calcData->indexSize, calcData->totalRows, calcData->overHeadSize, 
-  calcData->implementationBytesMemSize, calcData->cost);
+printf("#B %i : OFF %i : TAG %i : INDEX %i : ROWS %i : OVERHEAD %i : IMP %i : COST %lf\n", calcData->totalBlocks, calcData->offset, calcData->tagSize, calcData->indexSize,
+  calcData->totalRows, calcData->overHeadSize, calcData->implementationBytesMemSize, calcData->cost);
+
