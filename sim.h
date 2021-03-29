@@ -14,6 +14,18 @@ typedef struct CacheData
 
 }CacheData;
 
+//CalcData struct that holds calculated data for the cache
+typedef struct CalcValues
+{
+    int totalBlocks;
+    int tagSize;
+    int indexSize;
+    int totalRows;
+    int overHeadSize;
+    int implementationMemSize;
+    int cost;
+}CalcData;
+
 //Frees CacheData struct
 void freeCache(CacheData *cache){
     free(cache->fileName);
