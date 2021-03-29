@@ -15,7 +15,7 @@ typedef struct CacheData
 }CacheData;
 
 //CalcData struct that holds calculated data for the cache
-typedef struct CalcValues
+typedef struct CalcData
 {
     int totalBlocks;
     int tagSize;
