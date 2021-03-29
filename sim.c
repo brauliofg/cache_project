@@ -18,6 +18,9 @@ int main(int argc, char *argv[]){
     
     //Print Cache Input Parameters
     printCacheInput(cache);
+    
+    //Print Cache Calculated Results
+    printCacheResults(calcData);
 
     //Free struct that holds information from command line
     freeCache(cache);

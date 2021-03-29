@@ -112,16 +112,29 @@ void printCacheInput(CacheData *cache){
     printf("Cache Simulator CS 3853 Spring 2021 - Group #8\n\n");
     printf("Trace File: %s\n", cache->fileName);
     printf("\n***** Cache Input Parameters *****\n\n");
-    printf("Cache Size:             %d KB\n", cache->cacheSize);
-    printf("Block Size:             %d bytes\n", cache->blockSize);
-    printf("Associativity:          %d\n", cache->associativity);
+    printf("Cache Size:		    	%d KB\n", cache->cacheSize);
+    printf("Block Size:             	%d bytes\n", cache->blockSize);
+    printf("Associativity:          	%d\n", cache->associativity);
     if(strcmp(cache->replacementPolicy, "RR")==0){
-        printf("Replacement Policy:     Round-robin\n");
+        printf("Replacement Policy:		Round-robin\n");
     }
     else if(strcmp(cache->replacementPolicy, "RND")==0){
-        printf("Replacement Policy:     Random\n");
+        printf("Replacement Policy:		Random\n");
     }
     else if(strcmp(cache->replacementPolicy, "LRU")==0){
-        printf("Replacement Policy:     Least Recently Used\n");
+        printf("Replacement Policy:		Least Recently Used\n");
     }
+}
+
+//Prints Cache Caclculated Results
+void printCacheResults(CalcData *calcData){
+    double implementationInKB = (double)calcData->implementationBytesMemSize / 1024;
+    printf("\n***** Cache Calculated Values *****\n\n");
+    printf("Total # Blocks:			%d\n", calcData->totalBlocks);
+    printf("Tag Size:			%d bits\n", calcData->tagSize);
+    printf("Index Size:			%d bits\n", calcData->indexSize);
+    printf("Total # Rows:			%d bits\n", calcData->totalRows);
+    printf("Overhead Size:			%d bytes\n", calcData->overHeadSize);
+    printf("Implementation Memory Size:	%0.2lf KB (%d bytes)\n", implementationInKB, calcData->implementationBytesMemSize);
+    printf("Cost:				$%0.2lf\n", calcData->cost);
 }
