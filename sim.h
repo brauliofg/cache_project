@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 #define COST_OF_CACHE 0.09
 
 //CacheData struct that holds cache information
@@ -77,7 +78,7 @@ CalcData *initCalcValues(CacheData *cacheData){
     const int ONE_KB = 1024;
     const double DOUBLE_TWO = (double)2;
 
-    CalcData *calcData = (calcData*)malloc(sizeof(CalcData));
+    CalcData *calcData = (CalcData*)malloc(sizeof(CalcData));
 
     //Calculate offset uses change base formula
     calcData->offset = (int)(log10((double)cacheData->blockSize) / log10(DOUBLE_TWO))
@@ -104,7 +105,6 @@ CalcData *initCalcValues(CacheData *cacheData){
     calcData->cost = calcData->implementationBytesMemSize / ONE_KB * COST_OF_CACHE;
 
     return calcData;
-
 }
 
 //Prints Cache Input Parameters
