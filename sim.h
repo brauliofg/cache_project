@@ -221,12 +221,12 @@ void parseAndPrintFile(char *fileName)
             // printf("\nPrinting dstM Address: '%s'", dstMAddress); //debug
             // printf("\nPrinting srcM Address: '%s'", srcMAddress); //debug
             // printf("\n==============================================================\n\n\n");
-            if(lineCount < 21)
+            if(lineCount < 20)
             {
                 printf("0x%x: (%d)\n", (int)strtol(eipAddress, NULL, 16), (int)strtol(eipLeng, NULL, 16)); //debug
                 lineCount++;
             }
-            if((strcmp(dstMAddress,"00000000") != 0) && (lineCount < 21))
+            if((strcmp(dstMAddress,"00000000") != 0) && (lineCount < 20))
             {
                 printf("0x%x: (%d)\n", (int)strtol(dstMAddress, NULL, 16),4); //debug
                 lineCount++;
