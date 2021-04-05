@@ -133,7 +133,7 @@ void printCacheResults(CalcData *calcData){
     printf("Total # Blocks:			%d\n", calcData->totalBlocks);
     printf("Tag Size:			%d bits\n", calcData->tagSize);
     printf("Index Size:			%d bits\n", calcData->indexSize);
-    printf("Total # Rows:			%d bits\n", calcData->totalRows);
+    printf("Total # Rows:			%d\n", calcData->totalRows);
     printf("Overhead Size:			%d bytes\n", calcData->overHeadSize);
     printf("Implementation Memory Size:	%0.2lf KB (%d bytes)\n", implementationInKB, calcData->implementationBytesMemSize);
     printf("Cost:				$%0.2lf\n", calcData->cost);
@@ -231,7 +231,7 @@ void parseAndPrintFile(char *fileName)
                 printf("0x%x: (%d)\n", (int)strtol(dstMAddress, NULL, 16),4); //debug
                 lineCount++;
             }
-            if((strcmp(srcMAddress,"00000000") != 0) && (lineCount < 21))
+            if((strcmp(srcMAddress,"00000000") != 0) && (lineCount < 20))
             {
                 printf("0x%x: (%d)\n", (int)strtol(srcMAddress, NULL, 16),4); //debug    
                 lineCount++;
