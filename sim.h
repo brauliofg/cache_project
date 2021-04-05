@@ -109,7 +109,7 @@ CalcData *initCalcData(CacheData *cacheData){
 
 //Prints Cache Input Parameters
 void printCacheInput(CacheData *cache){
-    printf("Cache Simulator CS 3853 Spring 2021 - Group #8\n\n");
+    printf("Cache Simulator CS 3853 Spring 2021 - Group #08\n\n");
     printf("Trace File: %s\n", cache->fileName);
     printf("\n***** Cache Input Parameters *****\n\n");
     printf("Cache Size:		    	%d KB\n", cache->cacheSize);
