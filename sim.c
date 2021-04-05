@@ -21,6 +21,8 @@ int main(int argc, char *argv[]){
     
     //Print Cache Calculated Results
     printCacheResults(calcData);
+    
+    parseAndPrintFile(cache->fileName);
 
     //Free struct that holds information from command line
     freeCache(cache);

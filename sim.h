@@ -62,7 +62,7 @@ CacheData *initCacheData(int argc, char* argv[]){
             strcpy(cache->replacementPolicy, argv[i+1]);
         }
         else{
-            printf("Unknown input.\nExiting.\n");
+            printf("Unknown input: %s\nExiting.\n",argv[i]);
             freeCache(cache);
             exit(0);
         }
@@ -137,4 +137,113 @@ void printCacheResults(CalcData *calcData){
     printf("Overhead Size:			%d bytes\n", calcData->overHeadSize);
     printf("Implementation Memory Size:	%0.2lf KB (%d bytes)\n", implementationInKB, calcData->implementationBytesMemSize);
     printf("Cost:				$%0.2lf\n", calcData->cost);
+}
+
+
+void parseAndPrintFile(char *fileName)
+{
+    FILE* file = fopen(fileName, "r"); 
+    char line[256];
+    char eipLeng[20] = "-1";
+    char eipAddress[20] = "-1"; 
+    char dstMAddress[20] = "-1";
+    char srcMAddress[20] = "-1";
+    char * token;
+    int lineCount = 0;
+    
+    // token flag
+    // 0 = no needed value identified
+    // 1 = EIP Length
+    // 2 = EIP Address
+    // 3 = dstM Address
+    // 4 = srcM Address
+    int tokenFlag = 0; 
+    
+    printf("\nPrinting first 20 addresses for milestone #1:\n");
+    while (fgets(line, sizeof(line), file)) 
+    {
+        //printf("\n%s",line);
+
+        token = strtok(line, " ");
+        while( token != NULL ) 
+        {
+            
+            // if a needed value was identified store this current token in the appropriate variable
+            // 1 = EIP Length
+            // 2 = EIP Address
+            // 3 = dstM Address
+            // 4 = srcM Address
+            if(tokenFlag == 1) 
+            {
+                strncpy(eipLeng, token+1, 2);
+                tokenFlag = 2;
+            }
+         
+            else if(tokenFlag == 2) 
+            {
+                strcpy(eipAddress, token);
+                tokenFlag = 0;
+            } 
+            else if(tokenFlag == 3) 
+            {
+                strcpy(dstMAddress, token);
+                tokenFlag = 0;
+            } 
+            else if(tokenFlag == 4) 
+            {
+                strcpy(srcMAddress, token);
+                tokenFlag = 0;
+            }
+            
+            
+            if (strcmp(token,"EIP") == 0)
+            {
+                tokenFlag = 1;
+            }
+            else if(strcmp(token,"dstM:") == 0) 
+            {
+                tokenFlag = 3;
+            }
+            else if (strcmp(token,"srcM:") == 0) 
+            {
+                tokenFlag = 4;
+            }
+            
+            token = strtok(NULL, " ");
+
+        }
+        
+        if((strcmp(eipLeng,"-1") != 0) && (strcmp(eipAddress,"-1") != 0) && (strcmp(dstMAddress,"-1") != 0) && (strcmp(srcMAddress,"-1") != 0))
+        {
+            // printf("==============================================================");
+            // printf("\nPrinting EIP Length: '%s'", eipLeng); //debug
+            // printf("\nPrinting EIP Address: '%s'", eipAddress); //debug
+            // printf("\nPrinting dstM Address: '%s'", dstMAddress); //debug
+            // printf("\nPrinting srcM Address: '%s'", srcMAddress); //debug
+            // printf("\n==============================================================\n\n\n");
+            if(lineCount < 21)
+            {
+                printf("0x%x: (%d)\n", (int)strtol(eipAddress, NULL, 16), (int)strtol(eipLeng, NULL, 16)); //debug
+                lineCount++;
+            }
+            if((strcmp(dstMAddress,"00000000") != 0) && (lineCount < 21))
+            {
+                printf("0x%x: (%d)\n", (int)strtol(dstMAddress, NULL, 16),4); //debug
+                lineCount++;
+            }
+            if((strcmp(srcMAddress,"00000000") != 0) && (lineCount < 21))
+            {
+                printf("0x%x: (%d)\n", (int)strtol(srcMAddress, NULL, 16),4); //debug    
+                lineCount++;
+            }
+            
+            strcpy(eipLeng, "-1");
+            strcpy(eipAddress, "-1");
+            strcpy(dstMAddress, "-1");
+            strcpy(srcMAddress, "-1");
+        }
+        
+    }
+
+    fclose(file);
 }
