@@ -160,6 +160,7 @@ void parseAndPrintFile(char *fileName)
     int tokenFlag = 0; 
     
     //printf("\nPrinting first 20 addresses for milestone #1:\n");
+    printf("\n\n\n");
     while (fgets(line, sizeof(line), file)) 
     {
         //printf("\n%s",line);
