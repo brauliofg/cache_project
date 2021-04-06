@@ -223,17 +223,17 @@ void parseAndPrintFile(char *fileName)
             // printf("\n==============================================================\n\n\n");
             if(lineCount < 20)
             {
-                printf("0x%x: (%d)\n", (int)strtol(eipAddress, NULL, 16), (int)strtol(eipLeng, NULL, 16)); //debug
+                printf("0x%08x: (%04d)\n", (int)strtol(eipAddress, NULL, 16), (int)strtol(eipLeng, NULL, 16)); //debug
                 lineCount++;
             }
             if((strcmp(dstMAddress,"00000000") != 0) && (lineCount < 20))
             {
-                printf("0x%x: (%d)\n", (int)strtol(dstMAddress, NULL, 16),4); //debug
+                printf("0x%08x: (%04d)\n", (int)strtol(dstMAddress, NULL, 16),4); //debug
                 lineCount++;
             }
             if((strcmp(srcMAddress,"00000000") != 0) && (lineCount < 20))
             {
-                printf("0x%x: (%d)\n", (int)strtol(srcMAddress, NULL, 16),4); //debug    
+                printf("0x%08x: (%04d)\n", (int)strtol(srcMAddress, NULL, 16),4); //debug    
                 lineCount++;
             }
             
