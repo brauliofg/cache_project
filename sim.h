@@ -159,7 +159,7 @@ void parseAndPrintFile(char *fileName)
     // 4 = srcM Address
     int tokenFlag = 0; 
     
-    printf("\nPrinting first 20 addresses for milestone #1:\n");
+    //printf("\nPrinting first 20 addresses for milestone #1:\n");
     while (fgets(line, sizeof(line), file)) 
     {
         //printf("\n%s",line);
