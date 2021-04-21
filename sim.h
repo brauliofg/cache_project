@@ -228,7 +228,7 @@ void accessAddress(CacheData *cacheData, CalcData *calcData, cacheStruct **cache
     
     iTag = iAddress>>calcData->indexSize; //Sets iTag by removing index bits
     
-    if(strcmp(cacheData->replacementPolicy, "RND")==0){
+    if(strcmp(cacheData->replacementPolicy, "RR")==0){
         cacheAddRR(cacheData, calcData, cache, iOffset, iIndex, iTag, iLength);
     }
 }
