@@ -169,17 +169,20 @@ void printCacheSimResults(){
 
 //Implements round robin replacement policy
 void cacheAddRR(CacheData *cacheData, CalcData *calcData, cacheStruct **cache, unsigned int iOffset, unsigned int iIndex, unsigned int iTag, int iLength){
+    int minClock=-1;
     totalCacheAccess++;
+    CLOCK++;
     int j, min=-1;
     for(j=0; j<cacheData->associativity; j++){
         if(cache[iIndex][j].valid==1){
-            if(min==-1 || min > cache[iIndex][j].clock)
+            if(min==-1 || minClock > cache[iIndex][j].clock){
+                minClock = cache[iIndex][j].clock;
                 min = j;
+            }
         }
         
         if(cache[iIndex][j].valid==1 && cache[iIndex][j].tag == iTag){
             cacheHits++;
-            cache[iIndex][j].clock = CLOCK;
             break;
         }
         else if(cache[iIndex][j].valid == 0){
@@ -289,7 +292,6 @@ void parseFile(CacheData *cacheData, CalcData *calcData, cacheStruct **cache){
         }
         
         if((strcmp(eipLeng,"-1") != 0) && (strcmp(eipAddress,"-1") != 0) && (strcmp(dstMAddress,"-1") != 0) && (strcmp(srcMAddress,"-1") != 0)){
-            CLOCK++;
             accessAddress(cacheData, calcData, cache, eipAddress, eipLeng);
             totalAddresses++;
             
