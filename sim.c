@@ -38,7 +38,7 @@ int main(int argc, char *argv[]){
     
     //Print Cache Simulation Results
     printCacheSimResults();
-    
+    printCacheHitAndMissRate(cacheData, calcData);
     //Frees all malloced data
     freeCache(cache, calcData);
     freeCacheData(cacheData);
