@@ -3,13 +3,14 @@
 #include <string.h>
 #include <math.h>
 #define COST_OF_CACHE 0.09
-int CLOCK = 0;
 int totalAddresses=0;
 int totalCacheAccess=0;
 int cacheHits=0;
 int cacheMisses=0;
 int compMisses=0;
 int confMisses=0;
+int cycles=0;
+int totalInstruction=0;
 
 //CacheData struct that holds cache information
 typedef struct CacheData{
@@ -167,28 +168,41 @@ void printCacheSimResults(){
     printf("--- Conflict Misses:		%d\n", confMisses);
 }
 
+//Prints Cache Hit and Miss Rate
+void printCacheHitAndMissRate(CacheData *cacheData, CalcData *calcData){
+    //Calculates hit rate
+    double hitRate = (double)cacheHits/(double)totalCacheAccess;
+    //Calculates unused cache space KB
+    double unusedCacheSpace = (((double)calcData->totalBlocks - (double)compMisses) * ((double)cacheData->blockSize + (1.0 / 8.0) + ((double)calcData->tagSize / 8.0))) / 1024.0;
+    //Calculates total memory for cache in KB
+    double totalMemoryKB = (double)calcData->implementationBytesMemSize / 1024.0;
+
+    printf("\n***** ***** CACHE HIT & MISS RATE: ***** *****\n\n");
+    
+    printf("Hit Rate:			%.4f%%\n", hitRate * 100.0);
+    printf("Miss Rate:			%.4f%%\n", (1.0 - hitRate) * 100.0);
+    printf("CPI:				%0.2lf Cycles/Instruction (%d)\n", (double)cycles/totalInstruction, totalInstruction);
+    printf("Unused Cache Space:		%.2f KB / %.2f KB = %.2f%%   Waste: $%.2f\n", unusedCacheSpace, totalMemoryKB, 
+    (unusedCacheSpace / totalMemoryKB) * 100.0, unusedCacheSpace * COST_OF_CACHE);
+    printf("Unused Cache Blocks:		%d / %d\n", calcData->totalBlocks - compMisses, calcData->totalBlocks);
+}
+
 //Implements round robin replacement policy
-void cacheAddRR(CacheData *cacheData, CalcData *calcData, cacheStruct **cache, unsigned int iOffset, unsigned int iIndex, unsigned int iTag, int iLength){
+void cacheAddRR(CacheData *cacheData, CalcData *calcData, cacheStruct **cache, unsigned int iOffset, unsigned int iIndex, unsigned int iTag, int iLength, int *arr){
     int minClock=-1;
     totalCacheAccess++;
-    CLOCK++;
-    int j, min=-1;
+    
+    int j;
     for(j=0; j<cacheData->associativity; j++){
-        if(cache[iIndex][j].valid==1){
-            if(min==-1 || minClock > cache[iIndex][j].clock){
-                minClock = cache[iIndex][j].clock;
-                min = j;
-            }
-        }
-        
         if(cache[iIndex][j].valid==1 && cache[iIndex][j].tag == iTag){
             cacheHits++;
+            cycles++;
             break;
         }
         else if(cache[iIndex][j].valid == 0){
             cache[iIndex][j].valid=1;
             cache[iIndex][j].tag = iTag;
-            cache[iIndex][j].clock = CLOCK;
+            cycles+=(4 * ((int)ceil(cacheData->blockSize/4.0)));
             cacheMisses++;
             compMisses++;
             break;
@@ -196,14 +210,19 @@ void cacheAddRR(CacheData *cacheData, CalcData *calcData, cacheStruct **cache, u
         else if(j==(cacheData->associativity)-1){
             cacheMisses++;
             confMisses++;
-            cache[iIndex][min].tag=iTag;
-            cache[iIndex][min].clock=CLOCK;
+            cache[iIndex][arr[iIndex]].tag=iTag;
+            if(arr[iIndex]+1==cacheData->associativity){
+                arr[iIndex]=0;
+            }
+            else{
+                arr[iIndex]=arr[iIndex]+1;
+            }
+            cycles+=(4 * ((int)ceil(cacheData->blockSize/4.0)));
         }
     }
     
-    int offsetMax = log(cacheData->blockSize)/log(2); //Gets number of bits offset needs        
+    unsigned int offsetMax = log(cacheData->blockSize)/log(2); //Gets number of bits offset needs        
     offsetMax = (int)(pow(2, offsetMax)-1); //Gets limit offset that can be accessed without needing a new cache access
-    
     int lastBit = iOffset + iLength - 1; //Finds value of last bit to be accessed
     //Checks to see if last bit is out of bounds, sets iIndex to next valid index, calls cacheAddRR again to access the rest
     if(lastBit > offsetMax){
@@ -212,12 +231,12 @@ void cacheAddRR(CacheData *cacheData, CalcData *calcData, cacheStruct **cache, u
         }
         else
             iIndex=0;
-        cacheAddRR(cacheData, calcData, cache, 0, iIndex, iTag, iLength-(offsetMax-iOffset+1));
+        cacheAddRR(cacheData, calcData, cache, 0, iIndex, iTag, iLength-(offsetMax-iOffset+1), arr);
     }
 }
 
 //Address is deconstructed into tag, index, and offset and passed into appropriate function based on replacement policy chosen
-void accessAddress(CacheData *cacheData, CalcData *calcData, cacheStruct **cache, char addressToAdd[20], char eipLeng[20]){
+void accessAddress(CacheData *cacheData, CalcData *calcData, cacheStruct **cache, char addressToAdd[20], char eipLeng[20], int *arr){
     unsigned int iAddress = (int)strtol(addressToAdd, NULL, 16); //Converts address into integer
     unsigned int iTag, iOffset, iIndex;
     int iLength = (int)strtol(eipLeng, NULL, 10); //Converts instruction length into integer
@@ -232,7 +251,7 @@ void accessAddress(CacheData *cacheData, CalcData *calcData, cacheStruct **cache
     iTag = iAddress>>calcData->indexSize; //Sets iTag by removing index bits
     
     if(strcmp(cacheData->replacementPolicy, "RR")==0){
-        cacheAddRR(cacheData, calcData, cache, iOffset, iIndex, iTag, iLength);
+        cacheAddRR(cacheData, calcData, cache, iOffset, iIndex, iTag, iLength, arr);
     }
 }
 
@@ -245,6 +264,10 @@ void parseFile(CacheData *cacheData, CalcData *calcData, cacheStruct **cache){
     char dstMAddress[20] = "-1";
     char srcMAddress[20] = "-1";
     char * token;
+    int i, arr[calcData->totalRows];
+    for(i=0;i<calcData->totalRows;i++){
+        arr[i]=0;
+    }
     
     // token flag
     // 0 = no needed value identified
@@ -292,16 +315,19 @@ void parseFile(CacheData *cacheData, CalcData *calcData, cacheStruct **cache){
         }
         
         if((strcmp(eipLeng,"-1") != 0) && (strcmp(eipAddress,"-1") != 0) && (strcmp(dstMAddress,"-1") != 0) && (strcmp(srcMAddress,"-1") != 0)){
-            accessAddress(cacheData, calcData, cache, eipAddress, eipLeng);
+            accessAddress(cacheData, calcData, cache, eipAddress, eipLeng, arr);
             totalAddresses++;
-            
+            totalInstruction++;
+            cycles+=2;
             if((strcmp(dstMAddress,"00000000") != 0)){
-                accessAddress(cacheData, calcData, cache, dstMAddress, "4");
+                accessAddress(cacheData, calcData, cache, dstMAddress, "4", arr);
                 totalAddresses++;
+                cycles++;
             }
             if((strcmp(srcMAddress,"00000000") != 0)){
-                accessAddress(cacheData, calcData, cache, srcMAddress, "4");
+                accessAddress(cacheData, calcData, cache, srcMAddress, "4", arr);
                 totalAddresses++;
+                cycles++;
             }
             
             strcpy(eipLeng, "-1");
@@ -313,25 +339,4 @@ void parseFile(CacheData *cacheData, CalcData *calcData, cacheStruct **cache){
     }
 
     fclose(file);
-}
-
-//Prints Cache Hit and Miss Rate
-void printCacheHitAndMissRate(CacheData *cacheData, CalcData *calcData){
-  //Calculates hit rate
-  double hitRate = (double)cacheHits/(double)totalCacheAccess;
-  //Calculates unused cache space KB
-  double unusedCacheSpace = (((double)calcData->totalBlocks - (double)compMisses) * ((double)cacheData->blockSize + (1.0 / 8.0) + ((double)calcData->tagSize / 8.0))) / 1024.0;
-  //Calculates total memory for cache in KB
-  double totalMemoryKB = (double)calcData->implementationBytesMemSize / 1024.0;
-
-  printf("\n***** ***** CACHE HIT & MISS RATE: ***** *****\n\n");
-    
-  printf("Hit Rate:                %.4f%%\n", hitRate * 100.0);
-  printf("Miss Rate:               %.4f%%\n", (1.0 - hitRate) * 100.0);
-    
-  //printf("CPI:                     %.2f Cycles/Instruction\n", ); Need more information, total cycles done by simulations.
-    
-  printf("Unused Cache Space:      %.2f KB / %.2f KB = %.2f%%   Waste: $%.2f\n", unusedCacheSpace, totalMemoryKB, 
-    (unusedCacheSpace / totalMemoryKB) * 100.0, unusedCacheSpace * COST_OF_CACHE);
-  printf("Unused Cache Blocks:     %d / %d\n", calcData->totalBlocks - compMisses, calcData->totalBlocks);
 }
