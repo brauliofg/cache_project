@@ -11,22 +11,37 @@ int main(int argc, char *argv[]){
     }
 
     //Verify data and initialize CacheData struct with command line arguments
-    CacheData *cache = initCacheData(argc, argv);
+    CacheData *cacheData = initCacheData(argc, argv);
     
     //Initializes CalcData struct based on cache struct
-    CalcData *calcData = initCalcData(cache);
+    CalcData *calcData = initCalcData(cacheData);
+    cacheStruct **cache;
+    cache = (cacheStruct**)malloc(sizeof(cacheStruct)*calcData->totalRows);
+    int i, j;
+    for(i=0;i<calcData->totalRows;i++){
+        cache[i] = malloc(sizeof(cacheStruct)*cacheData->associativity);
+    }
+    for(i=0; i<calcData->totalRows; i++){
+        for(j=0; j<cacheData->associativity; j++){
+            cache[i][j].valid = 0;
+        }
+    }
     
     //Print Cache Input Parameters
-    printCacheInput(cache);
+    printCacheInput(cacheData);
     
     //Print Cache Calculated Results
     printCacheResults(calcData);
     
-    parseAndPrintFile(cache->fileName);
-
-    //Free struct that holds information from command line
-    freeCache(cache);
-    //Free struct that holds calc information
+    //Parse file
+    parseFile(cacheData, calcData, cache);
+    
+    //Print Cache Simulation Results
+    printCacheSimResults();
+    printCacheHitAndMissRate(cacheData, calcData);
+    //Frees all malloced data
+    freeCache(cache, calcData);
+    freeCacheData(cacheData);
     free(calcData);
     return 0;
 }
