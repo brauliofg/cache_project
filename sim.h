@@ -314,3 +314,24 @@ void parseFile(CacheData *cacheData, CalcData *calcData, cacheStruct **cache){
 
     fclose(file);
 }
+
+//Prints Cache Hit and Miss Rate
+void printCacheHitAndMissRate(CacheData *cacheData, CalcData *calcData){
+  //Calculates hit rate
+  double hitRate = (double)cacheHits/(double)totalCacheAccess;
+  //Calculates unused cache space KB
+  double unusedCacheSpace = (((double)calcData->totalBlocks - (double)compMisses) * ((double)cacheData->blockSize + (1.0 / 8.0) + ((double)calcData->tagSize / 8.0))) / 1024.0;
+  //Calculates total memory for cache in KB
+  double totalMemoryKB = (double)calcData->implementationBytesMemSize / 1024.0;
+
+  printf("\n***** ***** CACHE HIT & MISS RATE: ***** *****\n\n");
+    
+  printf("Hit Rate:                %.4f%%\n", hitRate * 100.0);
+  printf("Miss Rate:               %.4f%%\n", (1.0 - hitRate) * 100.0);
+    
+  //printf("CPI:                     %.2f Cycles/Instruction\n", ); Need more information, total cycles done by simulations.
+    
+  printf("Unused Cache Space:      %.2f KB / %.2f KB = %.2f%%   Waste: $%.2f\n", unusedCacheSpace, totalMemoryKB, 
+    (unusedCacheSpace / totalMemoryKB) * 100.0, unusedCacheSpace * COST_OF_CACHE);
+  printf("Unused Cache Blocks:     %d / %d\n", calcData->totalBlocks - compMisses, calcData->totalBlocks);
+}
