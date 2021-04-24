@@ -115,7 +115,8 @@ CalcData *initCalcData(CacheData *cacheData){
     calcData->totalRows = (int)pow(DOUBLE_TWO, (double)calcData->indexSize);
 
     //Calculate overhead size
-    calcData->overHeadSize = (calcData->indexSize + 1) * (cacheData->cacheSize * ONE_KB / cacheData->blockSize) / 8;
+    calcData->overHeadSize = calcData->totalBlocks / 8;
+    calcData->overHeadSize += ((calcData->totalBlocks * calcData->tagSize) / 8);
 
     //Calculate total implementation memory size in bytes
     calcData->implementationBytesMemSize = cacheData->cacheSize * ONE_KB + calcData->overHeadSize;
