@@ -119,7 +119,6 @@ CalcData *initCalcData(CacheData *cacheData){
     calcData->overHeadSize = calcData->totalBlocks / 8;
     calcData->overHeadSize += ((calcData->totalBlocks * calcData->tagSize) / 8);
 
-
     //Calculate total implementation memory size in bytes
     calcData->implementationBytesMemSize = cacheData->cacheSize * ONE_KB + calcData->overHeadSize;
 
