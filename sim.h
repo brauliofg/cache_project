@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include <math.h>
 #define COST_OF_CACHE 0.09
 int totalAddresses=0;
@@ -230,10 +231,59 @@ void cacheAddRR(CacheData *cacheData, CalcData *calcData, cacheStruct **cache, u
         if((iIndex+1) < calcData->totalRows) {
             iIndex+=1;
         }
-        else
+        else {
             iIndex=0;
+        }
         cacheAddRR(cacheData, calcData, cache, 0, iIndex, iTag, iLength-(offsetMax-iOffset+1), arr);
     }
+}
+
+void cacheAddRND(CacheData *cacheData, CalcData *calcData, cacheStruct **cache, unsigned int iOffset, unsigned int iIndex, unsigned int iTag, int iLength){
+    totalCacheAccess++;
+    
+    int j;
+    for(j=0; j<cacheData->associativity; j++){
+        if(cache[iIndex][j].valid==1 && cache[iIndex][j].tag == iTag){
+            cacheHits++;
+            cycles++;
+            break;
+        }
+        else if(cache[iIndex][j].valid == 0){
+            cache[iIndex][j].valid=1;
+            cache[iIndex][j].tag = iTag;
+            cycles+=(4 * ((int)ceil(cacheData->blockSize/4.0)));
+            cacheMisses++;
+            compMisses++;
+            break;
+        }
+        else if(j==(cacheData->associativity)-1){
+            cacheMisses++;
+            confMisses++;
+            srand(time(NULL));
+            int randNumber;
+            if(cacheData->associativity > 1){
+                randNumber = rand() % (cacheData->associativity-1);
+            }
+            else {
+                randNumber = rand() % (cacheData->associativity);
+            }
+            cache[iIndex][randNumber].tag=iTag;
+            cycles+=(4 * ((int)ceil(cacheData->blockSize/4.0)));
+        }
+    }
+    
+    unsigned int offsetMax = log(cacheData->blockSize)/log(2); //Gets number of bits offset needs        
+    offsetMax = (int)(pow(2, offsetMax)-1); //Gets limit offset that can be accessed without needing a new cache access
+    int lastBit = iOffset + iLength - 1; //Finds value of last bit to be accessed
+    //Checks to see if last bit is out of bounds, sets iIndex to next valid index, calls cacheAddRR again to access the rest
+    if(lastBit > offsetMax){
+        if((iIndex+1) < calcData->totalRows) {
+            iIndex+=1;
+        }
+        else
+            iIndex=0;
+        cacheAddRND(cacheData, calcData, cache, 0, iIndex, iTag, iLength-(offsetMax-iOffset+1));
+    }    
 }
 
 //Address is deconstructed into tag, index, and offset and passed into appropriate function based on replacement policy chosen
@@ -253,6 +303,9 @@ void accessAddress(CacheData *cacheData, CalcData *calcData, cacheStruct **cache
     
     if(strcmp(cacheData->replacementPolicy, "RR")==0){
         cacheAddRR(cacheData, calcData, cache, iOffset, iIndex, iTag, iLength, arr);
+    }
+    else if(strcmp(cacheData->replacementPolicy, "RND")==0){
+        cacheAddRND(cacheData, calcData, cache, iOffset, iIndex, iTag, iLength);        
     }
 }
 
